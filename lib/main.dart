@@ -1,67 +1,56 @@
-// Checklist de Colheita — PROJETO INICIAL (esqueleto)
-// Funcionalidade G do Caderno de Campo do Vale
-// Programação para Dispositivos Móveis · IF Goiano — Campus Ceres
+// =============================================================
+// Caderno de Campo do Vale
+// Funcionalidade G: Checklist de colheita
+// Disciplina: Programação para Dispositivos Móveis - IF Goiano, Campus Ceres
 //
-// O QUE VAMOS CONSTRUIR
-// Uma tela com a lista de tarefas da colheita. O produtor toca em um item
-// para marcá-lo como feito (ou desmarcá-lo), vê o percentual concluído
-// atualizar a cada toque e pode adicionar tarefas próprias.
-//
-// COMO USAR ESTE ESQUELETO
-// Tudo o que está marcado "JÁ PRONTO" só precisa ser lido e entendido.
-// Cada trecho a completar está marcado com "TODO PASSO N". Vá
-// preenchendo na ordem, salvando e vendo o hot reload aplicar cada
-// mudança. O app já roda desde o primeiro minuto (mostra 0% e a lista
-// vazia); ele vai ganhando vida a cada passo.
-//
-// IDEIA CENTRAL: DUAS LISTAS PARALELAS
-// _itens[indice] guarda o texto da tarefa e _concluido[indice] guarda se
-// ela já foi feita. As duas listas SEMPRE têm o mesmo tamanho e a mesma
-// ordem: a posição 2 de uma corresponde à posição 2 da outra.
-//
-// COMO RODAR (uma vez, no terminal, dentro desta pasta):
-//   flutter create .
-//   flutter pub get
-//   flutter run
+// Como usar este arquivo:
+// - Trechos marcados "JÁ PRONTO" não precisam ser escritos à mão.
+//   Leia, entenda e, na arguição, saiba explicar cada um.
+// - Trechos marcados "TODO PASSO N" são de vocês. Cada um explica
+//   o que fazer e quais conceitos de aula usar.
+// =============================================================
 
+// JÁ PRONTO: import do Flutter padrão (nenhum pacote externo)
 import 'package:flutter/material.dart';
 
-void main() => runApp(const ChecklistApp());
+// JÁ PRONTO: ponto de entrada do app
+void main() {
+  runApp(const CadernoDeCampoApp());
+}
 
-// =====================================================================
-// O app e o tema  (JÁ PRONTO)
-// =====================================================================
-class ChecklistApp extends StatelessWidget {
-  const ChecklistApp({super.key});
+// JÁ PRONTO: MaterialApp com o tema na cor institucional (verde IF Goiano)
+class CadernoDeCampoApp extends StatelessWidget {
+  const CadernoDeCampoApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Checklist de Colheita',
+      title: 'Caderno de Campo do Vale',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1E5631)),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF1E5631),
+          primary: const Color(0xFF1E5631),
+        ),
         useMaterial3: true,
       ),
-      home: const TelaChecklist(),
+      home: const TelaChecklistColheita(),
     );
   }
 }
 
-// =====================================================================
-// A tela com estado  (JÁ PRONTO)
-// É StatefulWidget porque o conteúdo muda: itens marcados e novos itens.
-// =====================================================================
-class TelaChecklist extends StatefulWidget {
-  const TelaChecklist({super.key});
+// JÁ PRONTO: tela com estado (StatefulWidget), pois a lista muda na tela
+class TelaChecklistColheita extends StatefulWidget {
+  const TelaChecklistColheita({super.key});
 
   @override
-  State<TelaChecklist> createState() => _TelaChecklistState();
+  State<TelaChecklistColheita> createState() => _TelaChecklistColheitaState();
 }
 
-class _TelaChecklistState extends State<TelaChecklist> {
-  // Lista com o texto de cada tarefa. (JÁ PRONTO)
-  final List<String> _itens = [
+class _TelaChecklistColheitaState extends State<TelaChecklistColheita> {
+  // JÁ PRONTO: lista com o texto de cada tarefa.
+  // Mesmo padrão dos talhões da aula: acessamos por índice, itens[indice].
+  List<String> itens = [
     'Regular a plataforma de corte da colheitadeira para a soja',
     'Conferir a umidade dos grãos de soja antes de iniciar a colheita',
     'Calibrar os sensores de perda de grãos na colheitadeira',
@@ -71,98 +60,79 @@ class _TelaChecklistState extends State<TelaChecklist> {
     'Limpar a caixa de grãos e a rosca de descarga antes de cada talhão',
   ];
 
-  // Lista paralela: _concluido[indice] diz se _itens[indice] já foi
-  // feito. Todas começam como false (pendente). (JÁ PRONTO)
-  final List<bool> _concluido = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
+  // JÁ PRONTO: lista paralela. concluido[indice] diz se itens[indice]
+  // já foi feito. As duas listas SEMPRE têm o mesmo tamanho.
+  List<bool> concluido = [false, false, false, false, false, false, false];
 
-  // Controlador do campo "novo item", com dispose logo abaixo. (JÁ PRONTO)
-  final _novoItemController = TextEditingController();
+  // JÁ PRONTO: controller do campo "novo item"
+  final TextEditingController controladorNovoItem = TextEditingController();
 
-  // Mensagem de erro do campo. Nulo = sem erro. Usada no PASSO 3.
-  // (JÁ PRONTO)
-  String? _erro;
+  // JÁ PRONTO: mensagem de erro do campo (vazia = sem erro).
+  // Usada no PASSO 3 para avisar o produtor.
+  String mensagemErro = '';
 
+  // JÁ PRONTO: libera a memória do controller quando a tela sai
   @override
   void dispose() {
-    _novoItemController.dispose();
+    controladorNovoItem.dispose();
     super.dispose();
   }
 
-  // -------------------------------------------------------------------
-  // TODO PASSO 1 — Calcule o percentual concluído.
-  // Percorra a lista _concluido contando quantos valores são true e
-  // devolva (contagem / total) * 100 como double, de 0.0 a 100.0.
-  //
-  // CUIDADO: se a lista estiver vazia, o total é 0 e não se divide por
-  // zero. Trate esse caso primeiro e devolva 0.0.
-  //
-  // Conceitos: for com índice, if, variável contadora, .length,
-  // divisão entre int e double.
-  //
-  // double _calcularPercentual() {
-  //   ...
-  // }
-  //
-  // Por enquanto a função devolve 0.0 só para o app compilar.
-  // -------------------------------------------------------------------
-  double _calcularPercentual() {
+  // -----------------------------------------------------------
+  // TODO PASSO 1: calcular o percentual concluído
+  // -----------------------------------------------------------
+  // O que fazer:
+  //   - Percorrer a lista concluido e contar quantos valores são true.
+  //   - Dividir pelo total de itens e multiplicar por 100.
+  //   - Devolver o resultado como double (0.0 a 100.0).
+  // Cuidado: se a lista estiver vazia, o total é 0 e não dá para dividir.
+  //   Trate esse caso e devolva 0.0.
+  // Conceitos: for com índice, if, variável contadora, lista.length,
+  //   divisão entre int e double.
+  // Por enquanto, a função devolve 0.0 só para o app compilar.
+  double calcularPercentual() {
+    // TODO PASSO 1: escreva o cálculo aqui
     return 0.0;
   }
 
-  // -------------------------------------------------------------------
-  // TODO PASSO 2 — Alterne o item entre concluído e pendente.
-  // Dentro de setState(), inverta o valor de _concluido[indice]:
-  // se era true vira false, se era false vira true.
-  // Esta função será chamada quando o produtor tocar no item
-  // (a ligação é feita no PASSO 4).
-  //
+  // -----------------------------------------------------------
+  // TODO PASSO 2: alternar o item entre concluído e pendente
+  // -----------------------------------------------------------
+  // O que fazer:
+  //   - Dentro de setState, inverter concluido[indice]:
+  //     se era true vira false, se era false vira true.
   // Conceitos: setState, acesso por índice, operador ! (negação).
-  //
-  // void _alternarItem(int indice) {
-  //   setState(() { ... });
-  // }
-  // -------------------------------------------------------------------
-  void _alternarItem(int indice) {}
+  // Esta função é chamada quando o produtor toca em um item
+  // (ela é passada como callback no PASSO 4).
+  void alternarItem(int indice) {
+    // TODO PASSO 2: escreva a lógica aqui, dentro de setState
+  }
 
-  // -------------------------------------------------------------------
-  // TODO PASSO 3 — Adicione um novo item.
-  // 1. Leia o texto de _novoItemController.text (use trim() para
-  //    ignorar espaços nas pontas).
-  // 2. Se estiver vazio, atualize _erro DENTRO de setState() com uma
-  //    mensagem clara, que diga ao produtor o que fazer, e saia da
-  //    função com return.
-  // 3. Se estiver preenchido, DENTRO de setState():
-  //      - acrescente o texto em _itens;
-  //      - acrescente false em _concluido (as duas listas crescem
-  //        juntas, sempre!);
-  //      - limpe o _erro (volte para null).
-  // 4. Limpe o campo com _novoItemController.clear().
-  //
-  // Conceitos: TextEditingController, validação de entrada, if/return,
-  // List.add, setState.
-  //
-  // void _adicionarItem() {
-  //   ...
-  // }
-  // -------------------------------------------------------------------
-  void _adicionarItem() {}
+  // -----------------------------------------------------------
+  // TODO PASSO 3: adicionar um novo item
+  // -----------------------------------------------------------
+  // O que fazer:
+  //   1. Ler o texto de controladorNovoItem.text (use trim() para
+  //      ignorar espaços).
+  //   2. Se estiver vazio, mostrar erro: dentro de setState, guardar
+  //      em mensagemErro um texto claro (ex.: dizer o que o produtor
+  //      deve fazer) e sair da função (return).
+  //   3. Se estiver preenchido, dentro de setState:
+  //        - adicionar o texto em itens;
+  //        - adicionar false em concluido (as duas listas crescem juntas!);
+  //        - limpar mensagemErro.
+  //   4. Limpar o controller (controladorNovoItem.clear()).
+  // Conceitos: TextEditingController, validação de entrada, if, return,
+  //   List.add, setState.
+  void adicionarItem() {
+    // TODO PASSO 3: escreva a função aqui
+  }
 
-  // =====================================================================
-  // A interface  (JÁ PRONTO, exceto o PASSO 4)
-  // =====================================================================
+  // JÁ PRONTO: montagem da tela
   @override
   Widget build(BuildContext context) {
-    // O percentual vem da função do PASSO 1 e é recalculado a cada
-    // setState(), porque o build roda de novo.
-    final percentual = _calcularPercentual();
+    // JÁ PRONTO: o percentual vem da função do PASSO 1
+    double percentual = calcularPercentual();
 
     return Scaffold(
       appBar: AppBar(
@@ -172,9 +142,10 @@ class _TelaChecklistState extends State<TelaChecklist> {
       ),
       body: Column(
         children: [
-          _PercentualConcluido(percentual: percentual),
+          // JÁ PRONTO: widget do percentual (recebe o valor já calculado)
+          PercentualConcluido(percentual: percentual),
 
-          // Campo e botão para adicionar item próprio. (JÁ PRONTO)
+          // JÁ PRONTO: campo e botão para adicionar item próprio
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Row(
@@ -182,22 +153,20 @@ class _TelaChecklistState extends State<TelaChecklist> {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _novoItemController,
+                    controller: controladorNovoItem,
                     decoration: InputDecoration(
                       labelText: 'Novo item',
                       border: const OutlineInputBorder(),
-                      errorText: _erro,
+                      // Mostra a mensagem de erro do PASSO 3 (null = sem erro)
+                      errorText: mensagemErro.isEmpty ? null : mensagemErro,
                     ),
                   ),
                 ),
                 const SizedBox(width: 8),
                 SizedBox(
                   height: 56,
-                  child: FilledButton(
-                    onPressed: _adicionarItem,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: const Color(0xFF1E5631),
-                    ),
+                  child: ElevatedButton(
+                    onPressed: adicionarItem,
                     child: const Text('Adicionar'),
                   ),
                 ),
@@ -205,30 +174,26 @@ class _TelaChecklistState extends State<TelaChecklist> {
             ),
           ),
 
-          // ---------------------------------------------------------------
-          // TODO PASSO 4 — Monte a lista com ListView.builder.
-          // - itemCount: quantos itens existem (_itens.length).
-          // - itemBuilder: para cada indice, devolva um _ItemChecklist
-          //   (já pronto lá embaixo), passando:
-          //     texto:     _itens[indice]
-          //     concluido: _concluido[indice]
-          //     aoTocar:   uma função sem parâmetros que chama
-          //                _alternarItem(indice)
-          //
-          // ListView.builder(
-          //   itemCount: ...,
-          //   itemBuilder: (context, indice) {
-          //     return _ItemChecklist(...);
-          //   },
-          // )
-          //
-          // Por enquanto itemCount é 0 só para o app compilar.
-          // ---------------------------------------------------------------
+          // -------------------------------------------------------
+          // TODO PASSO 4: montar a lista de itens com ListView.builder
+          // -------------------------------------------------------
+          // O que fazer:
+          //   - Em itemCount, informar quantos itens existem (itens.length).
+          //   - Em itemBuilder, para cada indice, devolver um
+          //     ItemChecklist (widget abaixo) passando:
+          //       texto:     itens[indice]
+          //       concluido: concluido[indice]
+          //       aoTocar:   uma função que chama alternarItem(indice)
+          // Conceitos: ListView.builder, acesso por índice, callback.
+          // Dica: o callback é uma função sem parâmetros, então
+          //   use () { ... } e chame alternarItem(indice) lá dentro.
+          // Por enquanto, itemCount é 0 só para o app compilar.
           Expanded(
             child: ListView.builder(
-              itemCount: 0,
+              itemCount: 0, // TODO PASSO 4: troque pelo total de itens
               itemBuilder: (context, indice) {
-                return const SizedBox.shrink();
+                // TODO PASSO 4: devolva um ItemChecklist aqui
+                return const SizedBox();
               },
             ),
           ),
@@ -238,21 +203,19 @@ class _TelaChecklistState extends State<TelaChecklist> {
   }
 }
 
-// =====================================================================
-// Faixa de percentual.  (JÁ PRONTO — já usada na tela)
-// Recebe o percentual já calculado; quem calcula é o PASSO 1.
-// =====================================================================
-class _PercentualConcluido extends StatelessWidget {
+// JÁ PRONTO: widget que mostra "X% concluído".
+// Recebe o percentual já calculado (o cálculo é o PASSO 1).
+class PercentualConcluido extends StatelessWidget {
   final double percentual;
 
-  const _PercentualConcluido({required this.percentual});
+  const PercentualConcluido({super.key, required this.percentual});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
-      color: const Color(0xFFD5F5E3),
+      color: const Color(0xFFE8F1EA),
       child: Text(
         '${percentual.toStringAsFixed(0)}% concluído',
         textAlign: TextAlign.center,
@@ -266,20 +229,19 @@ class _PercentualConcluido extends StatelessWidget {
   }
 }
 
-// =====================================================================
-// Item do checklist.  (JÁ PRONTO — pronto para usar no PASSO 4)
-// Pensado para uso no campo, com luva e sol forte:
-// - alvo de toque grande (altura mínima de 64 e linha inteira tocável);
+// JÁ PRONTO: visual de um item do checklist, pensado para uso no campo:
+// - alvo de toque grande (altura mínima de 64, linha inteira clicável)
 // - contraste forte: concluído = fundo verde, texto branco e riscado;
-//   pendente = fundo branco, borda verde e texto escuro.
-// A lógica do toque NÃO está aqui: ela chega pelo parâmetro aoTocar.
-// =====================================================================
-class _ItemChecklist extends StatelessWidget {
+//   pendente = fundo branco, borda e texto escuros.
+// A lógica do toque NÃO está aqui: ela chega pelo parâmetro aoTocar,
+// que vocês ligam no PASSO 4 (e implementam no PASSO 2).
+class ItemChecklist extends StatelessWidget {
   final String texto;
   final bool concluido;
   final VoidCallback aoTocar;
 
-  const _ItemChecklist({
+  const ItemChecklist({
+    super.key,
     required this.texto,
     required this.concluido,
     required this.aoTocar,
@@ -287,8 +249,8 @@ class _ItemChecklist extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final corFundo = concluido ? const Color(0xFF1E5631) : Colors.white;
-    final corTexto = concluido ? Colors.white : Colors.black87;
+    Color corFundo = concluido ? const Color(0xFF1E5631) : Colors.white;
+    Color corTexto = concluido ? Colors.white : Colors.black87;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
