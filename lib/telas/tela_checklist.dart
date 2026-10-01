@@ -18,6 +18,7 @@ class TelaChecklist extends StatefulWidget {
   const TelaChecklist({super.key});
 
   @override
+  State<TelaChecklist> createState() => _TelaChecklistState();
 }
 
 class _TelaChecklistState extends State<TelaChecklist> {
