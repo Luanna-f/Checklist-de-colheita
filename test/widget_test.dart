@@ -1,30 +1,35 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:caderno_campo/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('app inicializa com a tela do checklist', (tester) async {
+    await tester.pumpWidget(const ChecklistApp());
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    expect(find.text('Checklist de colheita'), findsOneWidget);
+    expect(find.text('0% concluído'), findsOneWidget);
+    expect(find.text('Todos'), findsOneWidget);
+  });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+  testWidgets('valida campo vazio e limpa o texto após adicionar',
+      (tester) async {
+    await tester.pumpWidget(const ChecklistApp());
+
+    await tester.tap(find.text('Adicionar'));
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(find.text('Digite uma tarefa antes de adicionar.'), findsOneWidget);
+
+    final campo = tester.widget<TextField>(find.byType(TextField));
+    await tester.enterText(find.byType(TextField), 'Colher uma amostra de soja');
+    await tester.pump();
+
+    expect(campo.controller?.text, 'Colher uma amostra de soja');
+
+    await tester.tap(find.text('Adicionar'));
+    await tester.pump();
+
+    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text, isEmpty);
   });
 }

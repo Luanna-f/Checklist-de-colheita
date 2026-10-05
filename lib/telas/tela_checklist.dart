@@ -65,63 +65,50 @@ class _TelaChecklistState extends State<TelaChecklist> {
   }
 
   // -------------------------------------------------------------------
-  // TODO PASSO 1 — Calcule o percentual concluído.
-  // Percorra a lista _concluido contando quantos valores são true e
-  // devolva (contagem / total) * 100 como double, de 0.0 a 100.0.
-  //
-  // CUIDADO: se a lista estiver vazia, o total é 0 e não se divide por
-  // zero. Trate esse caso primeiro e devolva 0.0.
-  //
-  // Conceitos: for com índice, if, variável contadora, .length,
-  // divisão entre int e double.
-  //
-  // double _calcularPercentual() {
-  //   ...
-  // }
-  //
-  // Por enquanto a função devolve 0.0 só para o app compilar.
-  // -------------------------------------------------------------------
+  // Calcula o percentual de itens concluídos.
   double _calcularPercentual() {
-    return 0.0;
+    if (_concluido.isEmpty) {
+      return 0.0;
+    }
+
+    int concluidos = 0;
+    for (int i = 0; i < _concluido.length; i++) {
+      if (_concluido[i]) {
+        concluidos++;
+      }
+    }
+
+    return (concluidos / _concluido.length) * 100;
   }
 
-  // -------------------------------------------------------------------
-  // TODO PASSO 2 — Alterne o item entre concluído e pendente.
-  // Dentro de setState(), inverta o valor de _concluido[indice]:
-  // se era true vira false, se era false vira true.
-  // Esta função será chamada quando o produtor tocar no item
-  // (a ligação é feita no PASSO 4).
-  //
-  // Conceitos: setState, acesso por índice, operador ! (negação).
-  //
-  // void _alternarItem(int indice) {
-  //   setState(() { ... });
-  // }
-  // -------------------------------------------------------------------
-  void _alternarItem(int indice) {}
+  // Altera o estado de um item entre concluído e pendente.
+  void _alternarItem(int indice) {
+    setState(() {
+      _concluido[indice] = !_concluido[indice];
+    });
+  }
 
-  // -------------------------------------------------------------------
-  // TODO PASSO 3 — Adicione um novo item.
-  // 1. Leia o texto de _novoItemController.text (use trim() para
-  //    ignorar espaços nas pontas).
-  // 2. Se estiver vazio, atualize _erro DENTRO de setState() com uma
-  //    mensagem clara, que diga ao produtor o que fazer, e saia da
-  //    função com return.
-  // 3. Se estiver preenchido, DENTRO de setState():
-  //      - acrescente o texto em _itens;
-  //      - acrescente false em _concluido (as duas listas crescem
-  //        juntas, sempre!);
-  //      - limpe o _erro (volte para null).
-  // 4. Limpe o campo com _novoItemController.clear().
-  //
-  // Conceitos: TextEditingController, validação de entrada, if/return,
-  // List.add, setState.
-  //
-  // void _adicionarItem() {
-  //   ...
-  // }
-  // -------------------------------------------------------------------
-  void _adicionarItem() {}
+  // Adiciona um novo item ao checklist com validação do texto.
+  void _adicionarItem() {
+    final texto = _novoItemController.text.trim();
+    debugPrint('ADICIONAR: texto="${texto}" tamanhoAntes=${_itens.length}');
+
+    if (texto.isEmpty) {
+      setState(() {
+        _erro = 'Digite uma tarefa antes de adicionar.';
+      });
+      return;
+    }
+
+    setState(() {
+      _itens.add(texto);
+      _concluido.add(false);
+      _erro = null;
+    });
+
+    debugPrint('ADICIONAR: tamanhoDepois=${_itens.length} ultimo=${_itens.last}');
+    _novoItemController.clear();
+  }
 
   // -------------------------------------------------------------------
   // Filtra os itens conforme a aba selecionada.  (JÁ PRONTO)
@@ -229,6 +216,7 @@ class _TelaChecklistState extends State<TelaChecklist> {
                     ),
                   )
                 : ListView.builder(
+                    shrinkWrap: true,
                     itemCount: indicesFiltrados.length,
                     itemBuilder: (context, posicao) {
                       final indiceOriginal = indicesFiltrados[posicao];
