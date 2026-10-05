@@ -2,7 +2,7 @@
 
 Aplicativo educacional em Flutter desenvolvido para a disciplina de **Programação para Dispositivos Móveis** no IF Goiano — Campus Ceres.
 
-A funcionalidade **G. Checklist de colheita** auxilia o produtor a acompanhar as tarefas antes e durante a colheita de soja e milho no Vale de São Patrício. A proposta é oferecer uma ferramenta simples, prática e visualmente clara para organização de rotina operacional no campo.
+A funcionalidade **Checklist de colheita** auxilia o produtor a acompanhar as tarefas antes e durante a colheita de soja e milho no Vale de São Patrício. A proposta é oferecer uma ferramenta simples, prática e visualmente clara para organização de rotina operacional no campo.
 
 ## Visão geral
 
