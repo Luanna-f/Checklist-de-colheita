@@ -1,10 +1,5 @@
-// Widget: visual de um item do checklist.
-// Pensado para uso no campo, com luva e sol forte:
-// - alvo de toque grande (altura mínima de 64 e linha inteira tocável);
-// - contraste forte: concluído = fundo verde, texto branco e riscado;
-//   pendente = fundo branco, borda verde e texto escuro.
-// A lógica do toque NÃO está aqui: ela chega pelo parâmetro aoTocar,
-// que a tela liga no PASSO 4 (e implementa no PASSO 2).
+// Componente visual de cada tarefa do checklist.
+// Mantém um alvo de toque grande e contraste forte para uso em campo.
 
 import 'package:flutter/material.dart';
 

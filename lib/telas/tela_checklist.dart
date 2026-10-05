@@ -1,15 +1,10 @@
-// Tela do Checklist de colheita.
-// Toda a lógica do app mora aqui: as duas listas paralelas, o filtro
-// de abas, o percentual e os quatro TODOs. Os widgets visuais vêm de
-// lib/widgets/ e são só importados.
-//
-// IDEIA CENTRAL: DUAS LISTAS PARALELAS
-// _itens[indice] guarda o texto da tarefa e _concluido[indice] guarda se
-// ela já foi feita. As duas listas SEMPRE têm o mesmo tamanho e a mesma
-// ordem: a posição 2 de uma corresponde à posição 2 da outra.
+// Tela principal do checklist de colheita.
+// A lista usa objetos imutáveis do tipo Tarefa e o estado da tela controla
+// o filtro, o percentual e a validação do novo item.
 
 import 'package:flutter/material.dart';
 
+import '../modelos/tarefa.dart';
 import '../widgets/barra_de_filtros.dart';
 import '../widgets/item_checklist.dart';
 import '../widgets/percentual_concluido.dart';
@@ -22,40 +17,26 @@ class TelaChecklist extends StatefulWidget {
 }
 
 class _TelaChecklistState extends State<TelaChecklist> {
-  // Lista com o texto de cada tarefa. (JÁ PRONTO)
-  final List<String> _itens = [
-    'Regular a plataforma de corte da colheitadeira para a soja',
-    'Conferir a umidade dos grãos de soja antes de iniciar a colheita',
-    'Calibrar os sensores de perda de grãos na colheitadeira',
-    'Vistoriar os talhões: tombamento, plantas daninhas e falhas de plantio',
-    'Revisar a plataforma e as correntes para a colheita do milho',
-    'Agendar caminhões para levar a produção até o armazém',
-    'Limpar a caixa de grãos e a rosca de descarga antes de cada talhão',
+  final List<Tarefa> _tarefas = [
+    const Tarefa(texto: 'Regular a plataforma de corte da colheitadeira para a soja'),
+    const Tarefa(
+        texto: 'Conferir a umidade dos grãos de soja antes de iniciar a colheita'),
+    const Tarefa(
+        texto: 'Calibrar os sensores de perda de grãos na colheitadeira'),
+    const Tarefa(
+        texto:
+            'Vistoriar os talhões: tombamento, plantas daninhas e falhas de plantio'),
+    const Tarefa(
+        texto: 'Revisar a plataforma e as correntes para a colheita do milho'),
+    const Tarefa(texto: 'Agendar caminhões para levar a produção até o armazém'),
+    const Tarefa(
+        texto: 'Limpar a caixa de grãos e a rosca de descarga antes de cada talhão'),
   ];
 
-  // Lista paralela: _concluido[indice] diz se _itens[indice] já foi
-  // feito. Todas começam como false (pendente). (JÁ PRONTO)
-  final List<bool> _concluido = [
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-    false,
-  ];
-
-  // Controlador do campo "novo item", com dispose logo abaixo. (JÁ PRONTO)
   final _novoItemController = TextEditingController();
 
-  // Mensagem de erro do campo. Nulo = sem erro. Usada no PASSO 3.
-  // (JÁ PRONTO)
   String? _erro;
 
-  // Qual aba está selecionada: 0 = Todos, 1 = A fazer, 2 = Concluídos.
-  // "Fingimos" as abas com um número guardado no estado: o valor muda
-  // ao tocar num botão (dentro de setState) e o build() usa esse valor
-  // para decidir quais itens mostrar. (JÁ PRONTO)
   int _abaSelecionada = 0;
 
   @override
@@ -64,34 +45,33 @@ class _TelaChecklistState extends State<TelaChecklist> {
     super.dispose();
   }
 
-  // -------------------------------------------------------------------
-  // Calcula o percentual de itens concluídos.
   double _calcularPercentual() {
-    if (_concluido.isEmpty) {
+    if (_tarefas.isEmpty) {
       return 0.0;
     }
 
     int concluidos = 0;
-    for (int i = 0; i < _concluido.length; i++) {
-      if (_concluido[i]) {
+    for (int i = 0; i < _tarefas.length; i++) {
+      if (_tarefas[i].concluido) {
         concluidos++;
       }
     }
 
-    return (concluidos / _concluido.length) * 100;
+    return (concluidos / _tarefas.length) * 100;
   }
 
-  // Altera o estado de um item entre concluído e pendente.
   void _alternarItem(int indice) {
     setState(() {
-      _concluido[indice] = !_concluido[indice];
+      final tarefaAtual = _tarefas[indice];
+      _tarefas[indice] = Tarefa(
+        texto: tarefaAtual.texto,
+        concluido: !tarefaAtual.concluido,
+      );
     });
   }
 
-  // Adiciona um novo item ao checklist com validação do texto.
   void _adicionarItem() {
     final texto = _novoItemController.text.trim();
-    debugPrint('ADICIONAR: texto="${texto}" tamanhoAntes=${_itens.length}');
 
     if (texto.isEmpty) {
       setState(() {
@@ -101,50 +81,31 @@ class _TelaChecklistState extends State<TelaChecklist> {
     }
 
     setState(() {
-      _itens.add(texto);
-      _concluido.add(false);
+      _tarefas.add(Tarefa(texto: texto));
       _erro = null;
+      _abaSelecionada = 0;
     });
 
-    debugPrint('ADICIONAR: tamanhoDepois=${_itens.length} ultimo=${_itens.last}');
     _novoItemController.clear();
   }
 
-  // -------------------------------------------------------------------
-  // Filtra os itens conforme a aba selecionada.  (JÁ PRONTO)
-  // Em vez de devolver os textos direto, devolvemos os ÍNDICES
-  // originais que passam no filtro. Assim, ao tocar num item filtrado,
-  // ainda sabemos qual posição alterar em _itens e _concluido.
-  // Conceitos: for com índice, if, List<int>.
-  // -------------------------------------------------------------------
   List<int> _indicesFiltrados() {
     final indices = <int>[];
-    for (int i = 0; i < _itens.length; i++) {
+    for (int i = 0; i < _tarefas.length; i++) {
       if (_abaSelecionada == 0) {
-        // Aba "Todos": mostra tudo.
         indices.add(i);
-      } else if (_abaSelecionada == 1 && !_concluido[i]) {
-        // Aba "A fazer": só os pendentes.
+      } else if (_abaSelecionada == 1 && !_tarefas[i].concluido) {
         indices.add(i);
-      } else if (_abaSelecionada == 2 && _concluido[i]) {
-        // Aba "Concluídos": só os já feitos.
+      } else if (_abaSelecionada == 2 && _tarefas[i].concluido) {
         indices.add(i);
       }
     }
     return indices;
   }
 
-  // =====================================================================
-  // A interface  (JÁ PRONTO, exceto os PASSOS 1 a 3)
-  // =====================================================================
   @override
   Widget build(BuildContext context) {
-    // O percentual vem da função do PASSO 1 e é recalculado a cada
-    // setState(), porque o build roda de novo.
     final percentual = _calcularPercentual();
-
-    // A lista de índices que passam no filtro da aba atual, recalculada
-    // a cada build (ou seja, a cada setState). (JÁ PRONTO)
     final indicesFiltrados = _indicesFiltrados();
 
     return Scaffold(
@@ -157,7 +118,6 @@ class _TelaChecklistState extends State<TelaChecklist> {
         children: [
           PercentualConcluido(percentual: percentual),
 
-          // Campo e botão para adicionar item próprio. (JÁ PRONTO)
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
             child: Row(
@@ -188,10 +148,6 @@ class _TelaChecklistState extends State<TelaChecklist> {
             ),
           ),
 
-          // Barra de abas (Todos / A fazer / Concluídos). (JÁ PRONTO)
-          // Não é um TabBar de verdade: são três botões que trocam
-          // _abaSelecionada dentro de setState, no mesmo padrão dos
-          // outros botões da tela.
           BarraDeFiltros(
             abaSelecionada: _abaSelecionada,
             aoSelecionar: (novaAba) {
@@ -201,12 +157,6 @@ class _TelaChecklistState extends State<TelaChecklist> {
             },
           ),
 
-          // Lista de itens da aba atual. (JÁ PRONTO)
-          // itemCount usa indicesFiltrados, não _itens, porque só
-          // mostramos os itens que passam no filtro da aba selecionada.
-          // "posicao" é a posição dentro da lista filtrada; o índice
-          // original (o que interessa para _itens/_concluido/
-          // _alternarItem) é indicesFiltrados[posicao].
           Expanded(
             child: indicesFiltrados.isEmpty
                 ? const Center(
@@ -216,13 +166,13 @@ class _TelaChecklistState extends State<TelaChecklist> {
                     ),
                   )
                 : ListView.builder(
-                    shrinkWrap: true,
                     itemCount: indicesFiltrados.length,
                     itemBuilder: (context, posicao) {
                       final indiceOriginal = indicesFiltrados[posicao];
+                      final tarefa = _tarefas[indiceOriginal];
                       return ItemChecklist(
-                        texto: _itens[indiceOriginal],
-                        concluido: _concluido[indiceOriginal],
+                        texto: tarefa.texto,
+                        concluido: tarefa.concluido,
                         aoTocar: () => _alternarItem(indiceOriginal),
                       );
                     },

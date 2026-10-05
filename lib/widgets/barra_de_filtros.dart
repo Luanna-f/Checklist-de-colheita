@@ -1,9 +1,5 @@
-// Widget: barra de abas fingida (Todos / A fazer / Concluídos).
-// Três botões lado a lado. O botão da aba atual fica preenchido
-// (FilledButton); os outros ficam só com borda (OutlinedButton).
-// Ao tocar, chama aoSelecionar com o número da aba escolhida — quem
-// decide o que fazer com isso é a tela (tela_checklist.dart), não este
-// widget.
+// Barra de filtros com as abas Todos, A fazer e Concluídos.
+// O estado da aba fica em tela_checklist.dart e este widget apenas renderiza a seleção.
 
 import 'package:flutter/material.dart';
 
@@ -33,8 +29,7 @@ class BarraDeFiltros extends StatelessWidget {
     );
   }
 
-  // Monta o botão de uma aba, já com o visual de selecionado/não
-  // selecionado.
+  // Monta o botão de uma aba com o visual de selecionado ou não.
   Widget _botaoAba(int aba, String rotulo) {
     final selecionada = aba == abaSelecionada;
 

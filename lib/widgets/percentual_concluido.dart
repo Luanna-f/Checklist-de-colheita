@@ -1,7 +1,5 @@
-// Widget: faixa de percentual.
-// Mostra "X% concluído". Recebe o percentual já calculado pela tela
-// (quem calcula é o PASSO 1, em tela_checklist.dart) — este arquivo só
-// desenha o valor que recebe.
+// Faixa de percentual do checklist.
+// Recebe o valor calculado pela tela e exibe apenas a métrica visual.
 
 import 'package:flutter/material.dart';
 

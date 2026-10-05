@@ -1,16 +1,6 @@
-// Checklist de Colheita — ponto de entrada do app
-// Funcionalidade G do Caderno de Campo do Vale
-// Programação para Dispositivos Móveis · IF Goiano — Campus Ceres
-//
-// Este arquivo agora só monta o app (tema, cor institucional) e aponta
-// para a tela principal. A lógica do checklist mora em
-// lib/telas/tela_checklist.dart, e os widgets visuais ficam em
-// lib/widgets/. Para mexer numa parte específica, edite o arquivo dela;
-// não é preciso tocar neste main.dart para acrescentar coisas na tela.
-//
-// COMO RODAR (uma vez, no terminal, dentro desta pasta):
-//   flutter pub get
-//   flutter run
+// Ponto de entrada do app Caderno de Campo do Vale.
+// Este arquivo monta o MaterialApp com o tema institucional do IF Goiano
+// e direciona a execução para a tela principal do checklist.
 
 import 'package:flutter/material.dart';
 
@@ -24,7 +14,7 @@ class ChecklistApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Checklist de Colheita',
+      title: 'Caderno de Campo do Vale',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF1E5631)),

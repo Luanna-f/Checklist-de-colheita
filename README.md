@@ -1,29 +1,19 @@
-# Caderno de Campo do Vale — Checklist de colheita
+# Caderno de Campo do Vale: Checklist de colheita
 
-Aplicativo educacional em Flutter desenvolvido para a disciplina de **Programação para Dispositivos Móveis** no IF Goiano — Campus Ceres.
-
-A funcionalidade **G. Checklist de colheita** auxilia o produtor a acompanhar as tarefas antes e durante a colheita de soja e milho no Vale de São Patrício. A proposta é oferecer uma ferramenta simples, prática e visualmente clara para organização de rotina operacional no campo.
+Este repositório implementa a funcionalidade G do app principal Caderno de Campo do Vale, desenvolvido no IF Goiano, Campus Ceres, na disciplina de Programação para Dispositivos Móveis. A proposta do projeto é oferecer um checklist para organização das etapas de colheita da soja e do milho durante a rotina de campo.
 
 ## Visão geral
 
-O app permite:
+O app foi pensado para uso em campo, com interface direta, visual institucional e foco na rapidez na marcação de tarefas. Ele permite acompanhar o que já foi concluído, o que precisa ser feito e quais itens ainda precisam atenção na colheita.
 
-- visualizar uma lista de tarefas de colheita;
-- marcar e desmarcar itens com toque;
-- acompanhar o percentual geral de conclusão;
-- inserir tarefas personalizadas;
-- filtrar a lista por aba: Todos, A fazer e Concluídos;
-- manter uma interface pronta para uso em campo, com identidade visual institucional do IF Goiano.
+## Funcionalidades
 
-## Funcionalidades implementadas
-
-- Lista inicial de tarefas relacionadas à colheita;
-- Toggle de conclusão para cada item;
-- Cálculo automático do progresso em porcentagem;
-- Validação do campo de nova tarefa antes de adicionar;
-- Exibição de mensagem de erro ao tentar inserir um item vazio;
-- Filtros por status da tarefa;
-- Tema visual verde institucional (`#1E5631`).
+- Lista inicial com sete tarefas da rotina de colheita.
+- Marcação e desmarcação de itens com toque simples.
+- Cálculo automático do percentual geral de conclusão.
+- Validação do campo de novo item antes de adicionar.
+- Filtro por abas: Todos, A fazer e Concluídos.
+- Tema visual verde institucional, com contraste forte e ação de toque em área ampla.
 
 ## Estrutura do projeto
 
@@ -33,6 +23,8 @@ O app permite:
 ├── ios/
 ├── lib/
 │   ├── main.dart
+│   ├── modelos/
+│   │   └── tarefa.dart
 │   ├── telas/
 │   │   └── tela_checklist.dart
 │   └── widgets/
@@ -41,60 +33,51 @@ O app permite:
 │       └── percentual_concluido.dart
 ├── test/
 │   └── widget_test.dart
-├── web/
 ├── analysis_options.yaml
 ├── pubspec.yaml
 ├── README.md
-└── .gitignore
+├── .gitignore
+├── .metadata
+└── .idea/
 ```
 
 ## Requisitos
 
-- Flutter SDK instalado e configurado;
-- Emulador ou dispositivo físico para execução;
-- Acesso à internet para baixar dependências do Flutter.
+- Flutter SDK instalado e configurado.
+- Emulador Android ou iOS em execução, ou dispositivo físico conectado.
+- Dependências do Flutter resolvidas com flutter pub get.
 
 ## Como executar
 
-Na pasta do projeto, execute:
+Na pasta do projeto, execute os comandos abaixo:
 
 ```bash
 flutter pub get
 flutter run
 ```
 
-Se o Flutter ainda não tiver criado o projeto em uma máquina nova, o comando abaixo pode ser usado uma vez para inicializar a estrutura local:
+## Testes
 
-```bash
-flutter create .
-flutter pub get
-flutter run
-```
-
-Depois disso, mantenha o arquivo principal do projeto como [lib/main.dart](lib/main.dart), que já aponta para a tela principal do checklist.
-
-## Identidade do app
-
-- Nome do app: `Checklist de Colheita`
-- ID do pacote: `br.edu.ifgoiano.ceres.caderno_campo`
-- Cor institucional: `#1E5631` (verde IF Goiano)
+Os testes automatizados validam a inicialização da aplicação, a mensagem de erro para campo vazio, a adição de novos itens, a mudança do percentual ao concluir tarefas e o retorno à aba Todos ao adicionar um item em Concluídos.
 
 ## Equipe
 
-| Papel | Responsável |
-|---|---|
-| Construtor | Felipe Ramos |
-| Designer de interface | Luanna Fernandes |
-| Relator | Tiago Cardoso |
+| Papel | Responsável | O que construiu |
+|---|---|---|
+| Construtor | Felipe Ramos | Lógica e estado em lib/telas/tela_checklist.dart: classe Tarefa (lib/modelos/tarefa.dart), alternar item com setState, cálculo do percentual, validação do novo item, filtro por aba. |
+| Designer de interface | Luanna Fernandes | Layout e decisões de campo em lib/widgets/: item com alvo de toque mínimo de 64 e contraste forte, faixa de percentual, barra de filtros, tema verde institucional (#1E5631). |
+| Relator | Tiago Cardoso | README, roteiro e condução da demonstração ao vivo, visão geral do trabalho. |
 
-## Observações
+## Requisitos do enunciado atendidos
 
-Este projeto foi pensado como uma solução educacional para o uso em dispositivos móveis, com foco em simplicidade, clareza visual e organização de tarefas no campo. A interface e a lógica foram desenvolvidas para simular a rotina real de um produtor durante a colheita, com foco em acompanhamento de execução e rastreio do progresso.
+1. Estado do checklist em setState, com atualização de tarefas e cálculo do percentual em lib/telas/tela_checklist.dart.
+2. Classe Tarefa imutável em lib/modelos/tarefa.dart, com final String texto e final bool concluido e construtor const.
+3. Validação de entrada em _adicionarItem em lib/telas/tela_checklist.dart, com a mensagem "Digite uma tarefa antes de adicionar.".
+4. Layout com Column, Row, Container e ListView.builder em lib/telas/tela_checklist.dart e widgets em lib/widgets/.
+5. Filtro por abas em BarraDeFiltros e indicesFiltrados em tela_checklist.dart, preservando o índice original para ordenar corretamente os itens.
+6. Dados regionais do contexto do projeto: soja, milho, talhões, armazém e rotina de campo, presentes nas tarefas iniciais em lib/telas/tela_checklist.dart.
+7. Identidade do app e funcionalidade G no MaterialApp e metadados de plataforma em lib/main.dart, android/app/src/main/AndroidManifest.xml e ios/Runner/Info.plist.
 
-## Validação e testes
+## Observações finais
 
-O projeto inclui testes de widget para verificar a inicialização da aplicação e o comportamento de adição de tarefas. Para executar os testes:
-
-```bash
-flutter test
-```
+A solução foi implementada seguindo as regras do enunciado, sem pacotes extras, sem persistência e sem alteração do comportamento visual fora do que foi pedido. O foco principal foi manter a interface simples, a lógica correta e o alinhamento com a avaliação prática do curso.
