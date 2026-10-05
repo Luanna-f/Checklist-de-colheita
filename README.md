@@ -28,8 +28,8 @@ Depois do `flutter create .`, mantenha o `lib/main.dart` deste projeto (se o com
 
 ## Quem construiu o quê
 
-| Designer Interface | Luanna F |
+| Papel | Responsável |
 |---|---|
-| Construtor | [NOME DO CONSTRUTOR] |
-| Designer de interface | [Luanna F ] |
-| Relator | [NOME DO RELATOR] |
+| Construtor | Felipe Ramos |
+| Designer de interface | Luanna Fernandes |
+| Relator | Tiago Cardoso |
