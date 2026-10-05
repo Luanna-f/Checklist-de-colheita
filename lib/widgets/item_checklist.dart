@@ -1,5 +1,7 @@
-// Componente visual de cada tarefa do checklist.
-// Mantém um alvo de toque grande e contraste forte para uso em campo.
+// A linha inteira é tocável e tem altura mínima de 64, para facilitar o uso com luva.
+// O contraste e o ícone diferenciam os estados sem depender apenas da cor.
+// Concluído usa fundo #1E5631, texto branco riscado e check; pendente usa fundo branco,
+// texto escuro e círculo vazio. O texto tem fonte 18 e o ícone, tamanho 32.
 
 import 'package:flutter/material.dart';
 

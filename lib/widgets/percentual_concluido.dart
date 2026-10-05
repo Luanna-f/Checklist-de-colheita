@@ -1,5 +1,4 @@
-// Faixa de percentual do checklist.
-// Recebe o valor calculado pela tela e exibe apenas a métrica visual.
+// O widget exibe o percentual que a tela já calculou.
 
 import 'package:flutter/material.dart';
 

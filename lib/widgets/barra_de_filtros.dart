@@ -1,5 +1,5 @@
-// Barra de filtros com as abas Todos, A fazer e Concluídos.
-// O estado da aba fica em tela_checklist.dart e este widget apenas renderiza a seleção.
+// A barra desenha os três botões e avisa qual aba foi tocada por aoSelecionar.
+// A tela guarda o estado selecionado.
 
 import 'package:flutter/material.dart';
 
@@ -29,14 +29,16 @@ class BarraDeFiltros extends StatelessWidget {
     );
   }
 
-  // Monta o botão de uma aba com o visual de selecionado ou não.
   Widget _botaoAba(int aba, String rotulo) {
     final selecionada = aba == abaSelecionada;
 
     if (selecionada) {
       return FilledButton(
         onPressed: () => aoSelecionar(aba),
-        style: FilledButton.styleFrom(backgroundColor: const Color(0xFF1E5631)),
+        style: FilledButton.styleFrom(
+          backgroundColor: const Color(0xFF1E5631),
+          minimumSize: const Size(0, 56),
+        ),
         child: Text(rotulo),
       );
     }
@@ -46,6 +48,7 @@ class BarraDeFiltros extends StatelessWidget {
       style: OutlinedButton.styleFrom(
         foregroundColor: const Color(0xFF1E5631),
         side: const BorderSide(color: Color(0xFF1E5631)),
+        minimumSize: const Size(0, 56),
       ),
       child: Text(rotulo),
     );

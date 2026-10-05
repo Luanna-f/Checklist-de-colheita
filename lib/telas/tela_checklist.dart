@@ -1,6 +1,5 @@
-// Tela principal do checklist de colheita.
-// A lista usa objetos imutáveis do tipo Tarefa e o estado da tela controla
-// o filtro, o percentual e a validação do novo item.
+// A tela guarda as tarefas, a aba selecionada e a mensagem de erro.
+// A cada setState, o build recalcula o percentual e os itens exibidos.
 
 import 'package:flutter/material.dart';
 
@@ -18,25 +17,35 @@ class TelaChecklist extends StatefulWidget {
 
 class _TelaChecklistState extends State<TelaChecklist> {
   final List<Tarefa> _tarefas = [
-    const Tarefa(texto: 'Regular a plataforma de corte da colheitadeira para a soja'),
     const Tarefa(
-        texto: 'Conferir a umidade dos grãos de soja antes de iniciar a colheita'),
+      texto: 'Regular a plataforma de corte da colheitadeira para a soja',
+    ),
     const Tarefa(
-        texto: 'Calibrar os sensores de perda de grãos na colheitadeira'),
+      texto: 'Conferir a umidade dos grãos de soja antes de iniciar a colheita',
+    ),
     const Tarefa(
-        texto:
-            'Vistoriar os talhões: tombamento, plantas daninhas e falhas de plantio'),
+      texto: 'Calibrar os sensores de perda de grãos na colheitadeira',
+    ),
     const Tarefa(
-        texto: 'Revisar a plataforma e as correntes para a colheita do milho'),
-    const Tarefa(texto: 'Agendar caminhões para levar a produção até o armazém'),
+      texto: 'Vistoriar os talhões: tombamento, plantas daninhas e falhas de plantio',
+    ),
     const Tarefa(
-        texto: 'Limpar a caixa de grãos e a rosca de descarga antes de cada talhão'),
+      texto: 'Revisar a plataforma e as correntes para a colheita do milho',
+    ),
+    const Tarefa(
+      texto: 'Agendar caminhões para levar a produção até o armazém',
+    ),
+    const Tarefa(
+      texto:
+          'Limpar a caixa de grãos e a rosca de descarga antes de cada talhão',
+    ),
   ];
 
   final _novoItemController = TextEditingController();
 
   String? _erro;
 
+  // As abas usam um número no estado: 0 para Todos, 1 para A fazer e 2 para Concluídos.
   int _abaSelecionada = 0;
 
   @override
@@ -63,6 +72,7 @@ class _TelaChecklistState extends State<TelaChecklist> {
   void _alternarItem(int indice) {
     setState(() {
       final tarefaAtual = _tarefas[indice];
+      // A nova tarefa substitui a antiga para que setState redesenhe a tela.
       _tarefas[indice] = Tarefa(
         texto: tarefaAtual.texto,
         concluido: !tarefaAtual.concluido,
@@ -80,13 +90,37 @@ class _TelaChecklistState extends State<TelaChecklist> {
       return;
     }
 
+    if (texto.length > 80) {
+      setState(() {
+        _erro = 'Use no máximo 80 caracteres.';
+      });
+      return;
+    }
+
+    if (_jaExiste(texto)) {
+      setState(() {
+        _erro = 'Essa tarefa já está na lista.';
+      });
+      return;
+    }
+
     setState(() {
       _tarefas.add(Tarefa(texto: texto));
       _erro = null;
+      // A tarefa nova fica visível mesmo quando a aba atual era Concluídos.
       _abaSelecionada = 0;
     });
 
     _novoItemController.clear();
+  }
+
+  bool _jaExiste(String texto) {
+    for (int i = 0; i < _tarefas.length; i++) {
+      if (_tarefas[i].texto.toLowerCase() == texto.toLowerCase()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   List<int> _indicesFiltrados() {
@@ -100,6 +134,7 @@ class _TelaChecklistState extends State<TelaChecklist> {
         indices.add(i);
       }
     }
+    // Os índices originais permitem alterar a tarefa certa, pois a posição filtrada pode ser diferente.
     return indices;
   }
 
@@ -116,6 +151,14 @@ class _TelaChecklistState extends State<TelaChecklist> {
       ),
       body: Column(
         children: [
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8),
+            child: Text(
+              'Colheita no Vale de São Patrício: soja e milho',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 14, color: Color(0xFF1E5631)),
+            ),
+          ),
           PercentualConcluido(percentual: percentual),
 
           Padding(
@@ -126,6 +169,13 @@ class _TelaChecklistState extends State<TelaChecklist> {
                 Expanded(
                   child: TextField(
                     controller: _novoItemController,
+                    onChanged: (valor) {
+                      if (_erro != null) {
+                        setState(() {
+                          _erro = null;
+                        });
+                      }
+                    },
                     decoration: InputDecoration(
                       labelText: 'Novo item',
                       border: const OutlineInputBorder(),

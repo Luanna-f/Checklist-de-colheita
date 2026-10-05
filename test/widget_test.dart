@@ -4,8 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:caderno_campo/main.dart';
 
 void main() {
-  testWidgets('app inicia com título, percentual inicial e aba Todos',
-      (tester) async {
+  testWidgets('app inicia com título, percentual inicial e aba Todos', (
+    tester,
+  ) async {
     await tester.pumpWidget(const ChecklistApp());
 
     expect(find.text('Checklist de colheita'), findsOneWidget);
@@ -22,23 +23,27 @@ void main() {
     expect(find.text('Digite uma tarefa antes de adicionar.'), findsOneWidget);
   });
 
-  testWidgets('adicionar um item válido inclui o texto na lista e limpa o campo',
-      (tester) async {
-    await tester.pumpWidget(const ChecklistApp());
+  testWidgets(
+    'adicionar um item válido inclui o texto na lista e limpa o campo',
+    (tester) async {
+      await tester.pumpWidget(const ChecklistApp());
 
-    const texto = 'Colher uma amostra de soja';
-    await tester.enterText(find.byType(TextField), texto);
-    await tester.pump();
+      const texto = 'Colher uma amostra de soja';
+      await tester.enterText(find.byType(TextField), texto);
+      await tester.pump();
 
-    await tester.tap(find.text('Adicionar'));
-    await tester.pump();
-    await tester.drag(find.byType(ListView), const Offset(0, -600));
-    await tester.pump();
+      await tester.tap(find.text('Adicionar'));
+      await tester.pump();
+      await tester.drag(find.byType(ListView), const Offset(0, -600));
+      await tester.pump();
 
-    expect(find.text(texto), findsOneWidget);
-    expect(tester.widget<TextField>(find.byType(TextField)).controller?.text,
-        isEmpty);
-  });
+      expect(find.text(texto), findsOneWidget);
+      expect(
+        tester.widget<TextField>(find.byType(TextField)).controller?.text,
+        isEmpty,
+      );
+    },
+  );
 
   testWidgets('tocar em um item altera o percentual', (tester) async {
     await tester.pumpWidget(const ChecklistApp());
@@ -51,23 +56,73 @@ void main() {
   });
 
   testWidgets(
-      'estando na aba Concluídos, adicionar um item volta para a aba Todos e o novo item aparece',
-      (tester) async {
+    'estando na aba Concluídos, adicionar um item volta para a aba Todos e o novo item aparece',
+    (tester) async {
+      await tester.pumpWidget(const ChecklistApp());
+
+      await tester.tap(find.text('Concluídos'));
+      await tester.pump();
+
+      const texto = 'Verificar o silo de armazenamento';
+      await tester.enterText(find.byType(TextField), texto);
+      await tester.pump();
+
+      await tester.tap(find.text('Adicionar'));
+      await tester.pump();
+      await tester.drag(find.byType(ListView), const Offset(0, -500));
+      await tester.pump();
+
+      expect(find.widgetWithText(FilledButton, 'Todos'), findsOneWidget);
+      expect(find.text(texto), findsOneWidget);
+    },
+  );
+
+  testWidgets('digitar após um erro remove a mensagem de validação', (
+    tester,
+  ) async {
     await tester.pumpWidget(const ChecklistApp());
-
-    await tester.tap(find.text('Concluídos'));
-    await tester.pump();
-
-    const texto = 'Verificar o silo de armazenamento';
-    await tester.enterText(find.byType(TextField), texto);
-    await tester.pump();
 
     await tester.tap(find.text('Adicionar'));
     await tester.pump();
-    await tester.drag(find.byType(ListView), const Offset(0, -500));
+    expect(find.text('Digite uma tarefa antes de adicionar.'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField), 'Conferir o armazém');
     await tester.pump();
 
-    expect(find.widgetWithText(FilledButton, 'Todos'), findsOneWidget);
-    expect(find.text(texto), findsOneWidget);
+    expect(find.text('Digite uma tarefa antes de adicionar.'), findsNothing);
+  });
+
+  testWidgets('não adiciona uma tarefa duplicada sem diferenciar maiúsculas', (
+    tester,
+  ) async {
+    await tester.pumpWidget(const ChecklistApp());
+
+    const textoOriginal =
+        'Regular a plataforma de corte da colheitadeira para a soja';
+    await tester.enterText(find.byType(TextField), textoOriginal.toUpperCase());
+    await tester.tap(find.text('Adicionar'));
+    await tester.pump();
+
+    expect(find.text('Essa tarefa já está na lista.'), findsOneWidget);
+    expect(find.text(textoOriginal), findsOneWidget);
+  });
+
+  testWidgets('recusa uma tarefa com mais de 80 caracteres', (tester) async {
+    await tester.pumpWidget(const ChecklistApp());
+
+    await tester.enterText(find.byType(TextField), 'a' * 81);
+    await tester.tap(find.text('Adicionar'));
+    await tester.pump();
+
+    expect(find.text('Use no máximo 80 caracteres.'), findsOneWidget);
+  });
+
+  testWidgets('mostra a faixa de contexto regional ao iniciar', (tester) async {
+    await tester.pumpWidget(const ChecklistApp());
+
+    expect(
+      find.text('Colheita no Vale de São Patrício: soja e milho'),
+      findsOneWidget,
+    );
   });
 }
