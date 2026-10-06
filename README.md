@@ -14,14 +14,11 @@ O aplicativo apresenta um checklist para acompanhar tarefas da colheita de soja 
 - Adição de tarefa própria, com validação de campo vazio, limite de 80 caracteres e duplicidade.
 - Filtros pelas abas Todos, A fazer e Concluídos.
 - Retorno à aba Todos após adicionar uma tarefa.
-- Faixa de contexto regional do Vale de São Patrício.
-- Tema verde institucional na cor #1E5631.
 
 ## Estrutura do projeto
 
 ```text
 .
-├── .idea/
 ├── android/
 ├── ios/
 ├── lib/
@@ -44,7 +41,6 @@ O aplicativo apresenta um checklist para acompanhar tarefas da colheita de soja 
 ├── .gitignore
 ├── .metadata
 ├── analysis_options.yaml
-├── caderno_campo.iml
 ├── pubspec.lock
 ├── pubspec.yaml
 └── README.md
@@ -89,10 +85,10 @@ flutter run
 
 | Requisito | Como foi atendido | Onde no código |
 |---|---|---|
-| Rodar sem erros no emulador Android ou dispositivo físico | flutter analyze e flutter test sem erros. Executado com flutter run em: (preencher o emulador ou dispositivo usado) | Validação do projeto |
+| Rodar sem erros no emulador Android ou dispositivo físico | flutter analyze e flutter test sem erros. Executado com flutter run no Android Studio | Validação do projeto |
 | Widget de layout e lista ou formulário | Column, Row, Container, ListView.builder e TextField com botão | lib/telas/tela_checklist.dart e lib/widgets/ |
 | Estado com setState | Alternar item, adicionar item e trocar de aba | lib/telas/tela_checklist.dart |
 | Evento além do toque simples | onChanged do TextField limpa o erro ao digitar, e _adicionarItem valida a entrada | lib/telas/tela_checklist.dart |
 | Validação da entrada com mensagem clara | Validação de campo vazio, texto com mais de 80 caracteres e tarefa duplicada | _adicionarItem em lib/telas/tela_checklist.dart |
-| Dados do contexto regional | Tarefas de soja, milho, talhões e armazém, além da faixa do Vale de São Patrício | lib/telas/tela_checklist.dart |
+| Dados do contexto regional | Tarefas de soja, milho, talhões e armazém | lib/telas/tela_checklist.dart |
 | README com o que faz, como rodar e o que cada integrante construiu | Visão geral, funcionalidades, instruções de execução e equipe | README.md, seções Como executar e Equipe |
