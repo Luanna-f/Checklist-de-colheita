@@ -72,7 +72,7 @@ class _TelaChecklistState extends State<TelaChecklist> {
   void _alternarItem(int indice) {
     setState(() {
       final tarefaAtual = _tarefas[indice];
-      // A nova tarefa substitui a antiga para que setState redesenhe a tela.
+      // Tarefa é imutável, então criamos uma nova com o valor invertido e a colocamos no lugar da antiga.
       _tarefas[indice] = Tarefa(
         texto: tarefaAtual.texto,
         concluido: !tarefaAtual.concluido,
